@@ -3,10 +3,24 @@ project(ImageSSIM VERSION 1.0)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_BUILD_TYPE debug)
 set(OpenCV_DIR D:/Tools/opencv/build/x64/mybuild)
+# 设置变量
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib_out)
+
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 file(GLOB LIB "D:/Tools/opencv/build/x64/mybuild/lib/*")
+file(GLOB PROJECT_LIB ${PROJECT_SOURCE_DIR}/lib/*)
 
-add_executable(${PROJECT_NAME} main.cpp)
-target_link_libraries(${PROJECT_NAME} ${LIB})
+ADD_LIBRARY(${PROJECT_NAME} SHARED main.cpp)
+INSTALL(TARGETS ${PROJECT_NAME})
+# 为dll设置linker
+# 指定dll的生成目录，这里是：./lib_out
+SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE C
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+        LIBRARY_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+        OUTPUT_NAME ${PROJECT_NAME}
+        PREFIX "")
+file(COPY ${PROJECT_LIB} DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} FOLLOW_SYMLINK_CHAIN)
+# target_link_libraries(${PROJECT_NAME} ${LIB})
+target_link_libraries(${PROJECT_NAME} ${PROJECT_LIB})
